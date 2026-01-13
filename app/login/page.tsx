@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { api } from '@/lib/api';
 import { setToken, setUser } from '@/lib/auth';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
+import logoMap from '../img/event_map_logo.jpeg'
 
 export default function LoginPage() {
   const router = useRouter();
@@ -114,12 +116,15 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="flex-1 bg-gradient-to-br from-blue-400 to-purple-500 hidden lg:flex items-center justify-center p-8">
-        <div className="text-center text-white">
-          <div className="text-6xl mb-4">📍</div>
-          <h2 className="text-4xl font-bold mb-2">Event Map</h2>
-          <p className="text-xl">Discover events around you</p>
-        </div>
+      <div className="relative flex-1 hidden lg:flex items-center justify-center">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-400/80 via-indigo-400/80 to-purple-500/80" />
+        <Image
+        src={logoMap}
+        alt="Event map Logo"
+        fill
+        priority
+        className="object-contain"
+        />
       </div>
     </div>
   );
