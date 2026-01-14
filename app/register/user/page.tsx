@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
+import logoMap from '../../img/event_map_logo.jpeg'
 
 export default function RegisterUserPage() {
   const router = useRouter();
@@ -77,19 +79,7 @@ export default function RegisterUserPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Company name</label>
-              <input
-                type="text"
-                value={formData.company}
-                onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                placeholder="Enter your company name"
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Work email address</label>
+              <label className="block text-sm font-medium mb-2">Your email address</label>
               <input
                 type="email"
                 value={formData.email}
@@ -168,11 +158,15 @@ export default function RegisterUserPage() {
         </div>
       </div>
 
-      <div className="flex-1 bg-gradient-to-br from-blue-400 to-purple-500 hidden lg:flex items-center justify-center p-8">
-        <div className="text-center text-white">
-          <div className="text-6xl mb-4">📍</div>
-          <h2 className="text-4xl font-bold mb-2">Event Map</h2>
-        </div>
+      <div className="relative flex-1 hidden lg:flex items-center justify-center">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-400/80 via-indigo-400/80 to-purple-500/80" />
+        <Image
+        src={logoMap}
+        alt="Event map Logo"
+        fill
+        priority
+        className="object-contain"
+        />
       </div>
     </div>
   );
