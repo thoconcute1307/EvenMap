@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
+import type React from 'react';
+
 
 export default function VerifyPage() {
   const router = useRouter();
@@ -89,12 +91,12 @@ export default function VerifyPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
       <div className="bg-white rounded-lg p-8 max-w-md w-full">
-        <h2 className="text-2xl font-bold mb-4 text-center">Verification</h2>
+        <h2 className="text-2xl font-bold mb-4 text-center text-gray-700">Verification</h2>
         <p className="text-gray-600 mb-6 text-center">
           Enter your 6 digits code that you received on your email.
         </p>
 
-        <div className="flex justify-center space-x-2 mb-6">
+        <div className="flex justify-center space-x-2 mb-6 text-gray-700">
           {code.map((digit, index) => (
             <input
               key={index}
@@ -104,13 +106,13 @@ export default function VerifyPage() {
               value={digit}
               onChange={(e) => handleCodeChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
-              className="w-12 h-12 text-center text-2xl border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary"
+              className="w-12 h-12 text-center text-2xl border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary text-gray-700"
             />
           ))}
         </div>
 
-        <div className="text-center mb-6">
-          <div className="text-orange-500 text-lg font-semibold">
+        <div className="text-center mb-6 text-gray-700">
+          <div className="text-orange-500 text-lg font-semibold text-gray-700">
             {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
           </div>
         </div>
@@ -118,24 +120,24 @@ export default function VerifyPage() {
         <button
           onClick={handleVerify}
           disabled={loading || code.join('').length !== 6}
-          className="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary-light disabled:opacity-50 mb-4"
+          className="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary-light disabled:opacity-50 mb-4 text-gray-700"
         >
           {loading ? 'Verifying...' : type === 'EMAIL_VERIFICATION' ? 'VERIFY' : 'CONTINUE'}
         </button>
 
-        <div className="text-center">
+        <div className="text-center text-gray-700">
           <span className="text-gray-600">If you didn't receive a code! </span>
           <button
             onClick={handleResend}
             disabled={resending || timeLeft > 0}
-            className="text-orange-500 hover:underline disabled:opacity-50"
+            className="text-orange-500 hover:underline disabled:opacity-50 text-gray-700"
           >
             Resend
           </button>
         </div>
 
-        <div className="mt-6 text-center">
-          <Link href="/login" className="text-blue-600 hover:underline">
+        <div className="mt-6 text-center text-gray-700">
+          <Link href="/login" className="text-blue-600 hover:underline text-gray-700">
             ← Back to Login
           </Link>
         </div>

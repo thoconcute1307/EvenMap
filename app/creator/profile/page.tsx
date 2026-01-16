@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { api } from '@/lib/api';
-import { getUser, setUser } from '@/lib/auth';
+import { getUser, setUser, hasRole } from '@/lib/auth';
 import toast from 'react-hot-toast';
 
-export default function ProfilePage() {
+export default function CreatorProfilePage() {
   const router = useRouter();
   const [user, setUserState] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -23,7 +23,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const currentUser = getUser();
-    if (!currentUser) {
+    if (!currentUser || !hasRole('EVENT_CREATOR')) {
       router.push('/login');
       return;
     }
@@ -66,21 +66,9 @@ export default function ProfilePage() {
     }
   };
 
-  const handleRoleRequest = async () => {
-    const response = await api.post('/api/users/role-request', {
-      requestedRole: 'EVENT_CREATOR',
-    });
-
-    if (response.error) {
-      toast.error(response.error);
-    } else {
-      toast.success('Request submitted. Waiting for admin approval.');
-    }
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100">
+      <div className="min-h-screen bg-gray-100 text-gray-800">
         <Header />
         <div className="container mx-auto p-8">
           <div className="text-center">Loading...</div>
@@ -105,7 +93,7 @@ export default function ProfilePage() {
                 />
               ) : (
                 <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center text-white text-3xl">
-                  {user?.name?.[0] || 'U'}
+                  {user?.name?.[0] || 'E'}
                 </div>
               )}
               <div>
@@ -136,22 +124,12 @@ export default function ProfilePage() {
 
             <div>
               <label className="block text-sm font-medium mb-2">Account Type</label>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="text"
-                  value={user?.role || 'USER'}
-                  disabled
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100"
-                />
-                {user?.role === 'USER' && (
-                  <button
-                    onClick={handleRoleRequest}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                  >
-                    Request Change
-                  </button>
-                )}
-              </div>
+              <input
+                type="text"
+                value={user?.role || 'EVENT_CREATOR'}
+                disabled
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100"
+              />
             </div>
 
             <div>

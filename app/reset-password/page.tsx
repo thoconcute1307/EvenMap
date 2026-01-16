@@ -2,9 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
+import { api } from '@/lib/api';
+
+import AuthLayout from '@/components/auth/AuthLayout';
+import PasswordInput from '@/components/auth/PasswordInput';
+import AuthButton from '@/components/auth/AuthButton';
+import AuthFooter from '@/components/auth/AuthFooter';
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -16,8 +20,6 @@ export default function ResetPasswordPage() {
     newPassword: '',
     confirmPassword: '',
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,75 +56,36 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
-      <div className="bg-white rounded-lg p-8 max-w-md w-full">
-        <h2 className="text-2xl font-bold mb-4">New Password</h2>
-        <p className="text-gray-600 mb-6">
-          Set the new password for your account so you can login and access all features.
-        </p>
+    <AuthLayout
+      title="New Password"
+      description="Set the new password for your account so you can login and access all features."
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <PasswordInput
+          label="New password"
+          value={formData.newPassword}
+          onChange={(e) =>
+            setFormData({ ...formData, newPassword: e.target.value })
+          }
+        />
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">Enter new password</label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={formData.newPassword}
-                onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
-                required
-                minLength={6}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary pr-10"
-                onCopy={(e) => e.preventDefault()}
-                onPaste={(e) => e.preventDefault()}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-              >
-                {showPassword ? '👁️' : '👁️‍🗨️'}
-              </button>
-            </div>
-          </div>
+        <PasswordInput
+          label="Confirm password"
+          value={formData.confirmPassword}
+          onChange={(e) =>
+            setFormData({ ...formData, confirmPassword: e.target.value })
+          }
+        />
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Confirm password</label>
-            <div className="relative">
-              <input
-                type={showConfirmPassword ? 'text' : 'password'}
-                value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                required
-                minLength={6}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary pr-10"
-                onCopy={(e) => e.preventDefault()}
-                onPaste={(e) => e.preventDefault()}
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-              >
-                {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
-              </button>
-            </div>
-          </div>
+        <AuthButton loading={loading}>
+          UPDATE PASSWORD
+        </AuthButton>
+      </form>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary-light disabled:opacity-50"
-          >
-            {loading ? 'Updating...' : 'UPDATE PASSWORD'}
-          </button>
-        </form>
-
-        <div className="mt-6 text-center">
-          <Link href="/login" className="text-blue-600 hover:underline">
-            ← Back to Login
-          </Link>
-        </div>
-      </div>
-    </div>
+      <AuthFooter
+        linkText="← Back to Login"
+        href="/login"
+      />
+    </AuthLayout>
   );
 }
