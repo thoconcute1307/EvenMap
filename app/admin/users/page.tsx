@@ -36,14 +36,7 @@ export default function AdminUsersPage() {
     totalPages: 0,
   });
 
-  useEffect(() => {
-    const user = getUser();
-    if (!user || !hasRole('ADMIN')) {
-      router.push('/login');
-      return;
-    }
-    fetchUsers();
-  }, [filters, pagination.page]);
+  
 
   const fetchUsers = async () => {
     setLoading(true);
