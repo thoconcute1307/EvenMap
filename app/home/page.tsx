@@ -36,14 +36,14 @@ export default function HomePage() {
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | undefined>(undefined);
   const [mapZoom, setMapZoom] = useState<number>(10);
 
-  useEffect(() => {
-    fetchCategories();
-    fetchRegions();
-  }, []);
+//   useEffect(() => {
+//     fetchCategories();
+//     fetchRegions();
+//   }, []);
 
-  useEffect(() => {
-    fetchEvents();
-  }, [filters, pagination.page]);
+//   useEffect(() => {
+//     fetchEvents();
+//   }, [filters, pagination.page]);
 
   // Update map center when region filter changes
   useEffect(() => {
@@ -60,52 +60,52 @@ export default function HomePage() {
     }
   }, [filters.region, regions]);
 
-  const fetchCategories = async () => {
-    try {
-      const response = await api.get('/api/categories');
-      if (response.data) {
-        setCategories(response.data);
-      }
-    } catch (error) {
-      // Fallback to backend API
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/categories`);
-      const data = await response.json();
-      if (data) setCategories(data);
-    }
-  };
+//   const fetchCategories = async () => {
+//     // try {
+//     // //   const response = await api.get('/api/categories');
+//     // //   if (response.data) {
+//     // //     setCategories(response.data);
+//     // //   }
+//     // } catch (error) {
+//     //   // Fallback to backend API
+//     //   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/categories`);
+//     //   const data = await response.json();
+//     //   if (data) setCategories(data);
+//     // }
+//   };
 
-  const fetchRegions = async () => {
-    try {
-      const response = await api.get('/api/regions');
-      if (response.data) {
-        setRegions(response.data);
-      }
-    } catch (error) {
-      // Fallback to backend API
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/regions`);
-      const data = await response.json();
-      if (data) setRegions(data);
-    }
-  };
+//   const fetchRegions = async () => {
+//     try {
+//       const response = await api.get('/api/regions');
+//       if (response.data) {
+//         setRegions(response.data);
+//       }
+//     } catch (error) {
+//       // Fallback to backend API
+//       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/regions`);
+//       const data = await response.json();
+//       if (data) setRegions(data);
+//     }
+//   };
 
-  const fetchEvents = async () => {
-    setLoading(true);
-    const params = new URLSearchParams({
-      page: pagination.page.toString(),
-      limit: pagination.limit.toString(),
-      ...Object.fromEntries(Object.entries(filters).filter(([_, v]) => v)),
-    });
+//   const fetchEvents = async () => {
+//     setLoading(true);
+//     const params = new URLSearchParams({
+//       page: pagination.page.toString(),
+//       limit: pagination.limit.toString(),
+//       ...Object.fromEntries(Object.entries(filters).filter(([_, v]) => v)),
+//     });
 
-    const response = await api.get<{ events: Event[]; pagination: any }>(`/api/events?${params}`);
-    setLoading(false);
+//     const response = await api.get<{ events: Event[]; pagination: any }>(`/api/events?${params}`);
+//     setLoading(false);
 
-    if (response.data) {
-      setEvents(response.data.events);
-      setPagination(response.data.pagination);
-    } else {
-      toast.error(response.error || 'Failed to load events');
-    }
-  };
+//     if (response.data) {
+//       setEvents(response.data.events);
+//       setPagination(response.data.pagination);
+//     } else {
+//       toast.error(response.error || 'Failed to load events');
+//     }
+//   };
 
   const handleInterested = async (eventId: string) => {
     await fetchEvents();
