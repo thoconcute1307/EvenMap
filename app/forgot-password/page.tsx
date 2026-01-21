@@ -5,6 +5,15 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
+<<<<<<< HEAD
+=======
+import AuthLayout from '@/components/auth/AuthLayout';
+import TextInput from '@/components/auth/TextInput';
+import AuthButton from '@/components/auth/AuthButton';
+import AuthFooter from '@/components/auth/AuthFooter';
+
+
+>>>>>>> QuocDo2
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -27,6 +36,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
+<<<<<<< HEAD
     <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
       <div className="bg-white rounded-lg p-8 max-w-md w-full">
         <h2 className="text-2xl font-bold mb-4">Forgot password</h2>
@@ -63,5 +73,34 @@ export default function ForgotPasswordPage() {
         </div>
       </div>
     </div>
+=======
+    <AuthLayout>
+      <h2 className="text-gray-600 text-2xl font-bold mb-4">Forgot password</h2>
+      <p className="text-gray-600 mb-6">
+        Enter your email for the verification process.
+      </p>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <TextInput
+          type="email"
+          placeholder="Enter email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+
+        <AuthButton loading={loading}>
+          CONTINUE
+        </AuthButton>
+      </form>
+
+      <AuthFooter
+        text=""
+        linkText="← Back to Login"
+        href="/login"
+      />
+    </AuthLayout>
+
+>>>>>>> QuocDo2
   );
 }
