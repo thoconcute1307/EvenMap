@@ -38,14 +38,7 @@ export default function EditUserPage() {
     avatar: '',
   });
 
-  useEffect(() => {
-    const currentUser = getUser();
-    if (!currentUser || !hasRole('ADMIN')) {
-      router.push('/login');
-      return;
-    }
-    fetchUser();
-  }, [userId]);
+
 
   const fetchUser = async () => {
     setLoading(true);
@@ -99,7 +92,7 @@ export default function EditUserPage() {
   return (
     <div className="min-h-screen bg-gray-100">
       <Header />
-      
+
       <div className="container mx-auto p-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Chỉnh sửa thông tin tài khoản</h1>

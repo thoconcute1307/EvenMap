@@ -36,14 +36,7 @@ export default function AdminUsersPage() {
     totalPages: 0,
   });
 
-  useEffect(() => {
-    const user = getUser();
-    if (!user || !hasRole('ADMIN')) {
-      router.push('/login');
-      return;
-    }
-    fetchUsers();
-  }, [filters, pagination.page]);
+
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -81,7 +74,7 @@ export default function AdminUsersPage() {
   return (
     <div className="min-h-screen bg-gray-100">
       <Header />
-      
+
       <div className="container mx-auto p-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Quản lý tài khoản</h1>
