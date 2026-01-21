@@ -2,9 +2,19 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+<<<<<<< HEAD
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
+=======
+import toast from 'react-hot-toast';
+import { api } from '@/lib/api';
+
+import AuthLayout from '@/components/auth/AuthLayout';
+import PasswordInput from '@/components/auth/PasswordInput';
+import AuthButton from '@/components/auth/AuthButton';
+import AuthFooter from '@/components/auth/AuthFooter';
+>>>>>>> QuocDo2
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -16,8 +26,11 @@ export default function ResetPasswordPage() {
     newPassword: '',
     confirmPassword: '',
   });
+<<<<<<< HEAD
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+=======
+>>>>>>> QuocDo2
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,6 +67,7 @@ export default function ResetPasswordPage() {
   };
 
   return (
+<<<<<<< HEAD
     <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
       <div className="bg-white rounded-lg p-8 max-w-md w-full">
         <h2 className="text-2xl font-bold mb-4">New Password</h2>
@@ -124,5 +138,38 @@ export default function ResetPasswordPage() {
         </div>
       </div>
     </div>
+=======
+    <AuthLayout
+      title="New Password"
+      description="Set the new password for your account so you can login and access all features."
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <PasswordInput
+          label="New password"
+          value={formData.newPassword}
+          onChange={(e) =>
+            setFormData({ ...formData, newPassword: e.target.value })
+          }
+        />
+
+        <PasswordInput
+          label="Confirm password"
+          value={formData.confirmPassword}
+          onChange={(e) =>
+            setFormData({ ...formData, confirmPassword: e.target.value })
+          }
+        />
+
+        <AuthButton loading={loading}>
+          UPDATE PASSWORD
+        </AuthButton>
+      </form>
+
+      <AuthFooter
+        linkText="← Back to Login"
+        href="/login"
+      />
+    </AuthLayout>
+>>>>>>> QuocDo2
   );
 }
