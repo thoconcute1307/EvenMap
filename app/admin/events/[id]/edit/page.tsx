@@ -1,20 +1,25 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import Header from '@/components/Header';
 import ImageUpload from '@/components/ImageUpload';
-import SuccessModal from '@/components/SuccessModal';
 import { api } from '@/lib/api';
 import { getUser, hasRole } from '@/lib/auth';
+import { Event } from '@/types/event';
 import toast from 'react-hot-toast';
+import Link from 'next/link';
 import dynamic from 'next/dynamic';
 
 const MapComponent = dynamic(() => import('@/components/MapComponent'), { ssr: false });
 
-export default function CreateEventPage() {
+export default function AdminEditEventPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const params = useParams();
+  const eventId = params.id as string;
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [event, setEvent] = useState<Event | null>(null);
   const [categories, setCategories] = useState<any[]>([]);
   const [regions, setRegions] = useState<any[]>([]);
   const [formData, setFormData] = useState({
@@ -27,17 +32,8 @@ export default function CreateEventPage() {
     categoryId: '',
     regionId: '',
   });
-  const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  useEffect(() => {
-    const user = getUser();
-    if (!user || !hasRole('EVENT_CREATOR')) {
-      router.push('/login');
-      return;
-    }
-    fetchCategoriesAndRegions();
-  }, []);
+  
 
   const fetchCategoriesAndRegions = async () => {
     try {
@@ -56,6 +52,29 @@ export default function CreateEventPage() {
       ]);
       if (categoriesRes) setCategories(categoriesRes);
       if (regionsRes) setRegions(regionsRes);
+    }
+  };
+
+  const fetchEvent = async () => {
+    setLoading(true);
+    const response = await api.get<Event>(`/api/events/${eventId}`);
+    setLoading(false);
+
+    if (response.data) {
+      setEvent(response.data);
+      setFormData({
+        name: response.data.name,
+        description: response.data.description,
+        image: response.data.image || '',
+        location: response.data.location,
+        startTime: new Date(response.data.startTime).toISOString().slice(0, 16),
+        endTime: new Date(response.data.endTime).toISOString().slice(0, 16),
+        categoryId: response.data.categoryId,
+        regionId: response.data.regionId,
+      });
+    } else {
+      toast.error(response.error || 'Failed to load event');
+      router.push('/admin/events');
     }
   };
 
@@ -93,31 +112,14 @@ export default function CreateEventPage() {
     return { valid: true };
   };
 
-  const handleLocationChange = async (address: string) => {
-    setFormData({ ...formData, location: address });
-    // Geocoding will be done on backend when creating event
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-
-    if (!formData.name || formData.name.length < 3) {
-      toast.error('Tên sự kiện phải có ít nhất 3 ký tự');
-      setLoading(false);
-      return;
-    }
-
-    if (!formData.description || formData.description.length < 10) {
-      toast.error('Mô tả sự kiện phải có ít nhất 10 ký tự');
-      setLoading(false);
-      return;
-    }
+    setSaving(true);
 
     // Validate khu vực (bắt buộc)
     if (!formData.regionId) {
       toast.error('Vui lòng chọn khu vực');
-      setLoading(false);
+      setSaving(false);
       return;
     }
 
@@ -125,38 +127,54 @@ export default function CreateEventPage() {
     const addressValidation = validateAddress(formData.location);
     if (!addressValidation.valid) {
       toast.error(addressValidation.error || 'Địa chỉ không hợp lệ');
-      setLoading(false);
+      setSaving(false);
       return;
     }
 
-    if (!formData.startTime || !formData.endTime) {
-      toast.error('Vui lòng nhập thời gian bắt đầu và kết thúc');
-      setLoading(false);
-      return;
-    }
-
-    if (new Date(formData.startTime) >= new Date(formData.endTime)) {
-      toast.error('Thời gian kết thúc phải sau thời gian bắt đầu');
-      setLoading(false);
-      return;
-    }
-
-    const response = await api.post('/api/events', formData);
-    setLoading(false);
+    const response = await api.put(`/api/admin/events/${eventId}`, formData);
+    setSaving(false);
 
     if (response.error) {
       toast.error(response.error);
     } else {
-      setShowSuccessModal(true);
+      toast.success('Cập nhật sự kiện thành công!');
+      router.push('/admin/events');
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100">
+        <Header />
+        <div className="container mx-auto p-8">
+          <div className="text-center">Loading...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
       <Header />
       
       <div className="container mx-auto p-8">
-        <h1 className="text-3xl font-bold mb-6">Tạo sự kiện</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">Chỉnh sửa sự kiện</h1>
+          <div className="flex space-x-4">
+            <Link
+              href="/admin/events"
+              className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-light"
+            >
+              Quản lí Sự Kiện
+            </Link>
+            <Link
+              href="/admin/users"
+              className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300"
+            >
+              Quản lí tài khoản
+            </Link>
+          </div>
+        </div>
 
         <form onSubmit={handleSubmit} className="bg-gray-200 rounded-lg p-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -192,7 +210,7 @@ export default function CreateEventPage() {
                 <input
                   type="text"
                   value={formData.location}
-                  onChange={(e) => handleLocationChange(e.target.value)}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                   placeholder="Ví dụ: 123 Đường ABC, Phường XYZ, Quận 1"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                   required
@@ -204,8 +222,7 @@ export default function CreateEventPage() {
 
               <div className="h-64 rounded-lg overflow-hidden">
                 <MapComponent
-                  events={[]}
-                  center={selectedLocation || undefined}
+                  events={event ? [event] : []}
                 />
               </div>
             </div>
@@ -220,7 +237,6 @@ export default function CreateEventPage() {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Enter event name"
                   required
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                 />
@@ -232,7 +248,6 @@ export default function CreateEventPage() {
                   value={formData.categoryId}
                   onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                  required
                 >
                   <option value="">Thể Loại Sự Kiện</option>
                   {categories.map((cat) => (
@@ -270,7 +285,6 @@ export default function CreateEventPage() {
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Enter event description"
                   required
                   rows={6}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
@@ -279,25 +293,15 @@ export default function CreateEventPage() {
 
               <button
                 type="submit"
-                disabled={loading}
+                disabled={saving}
                 className="w-full bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50"
               >
-                {loading ? 'Creating...' : 'Thêm'}
+                {saving ? 'Saving...' : 'Lưu'}
               </button>
             </div>
           </div>
         </form>
       </div>
-
-      <SuccessModal
-        isOpen={showSuccessModal}
-        title="Successfully"
-        message="Sự kiện của bạn đã tạo thành công"
-        onContinue={() => {
-          setShowSuccessModal(false);
-          router.push('/creator/events');
-        }}
-      />
     </div>
   );
 }
