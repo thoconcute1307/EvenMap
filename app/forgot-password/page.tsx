@@ -3,8 +3,21 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
+const api = {
+  post: (url: string, data: any) => {
+    return new Promise<{ error?: string }>((resolve) => {
+      setTimeout(() => {
+        // giả lập email hợp lệ
+        if (data.email === 'test@gmail.com') {
+          resolve({});
+        } else {
+          resolve({ error: 'Email does not exist' });
+        }
+      }, 1200);
+    });
+  },
+};
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -16,13 +29,16 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     const response = await api.post('/api/auth/forgot-password', { email });
+
     setLoading(false);
 
     if (response.error) {
       toast.error(response.error);
     } else {
       toast.success('Password reset code sent to your email');
-      router.push(`/verify?email=${encodeURIComponent(email)}&type=PASSWORD_RESET`);
+      router.push(
+        `/verify?email=${encodeURIComponent(email)}&type=PASSWORD_RESET`
+      );
     }
   };
 
@@ -31,7 +47,8 @@ export default function ForgotPasswordPage() {
       <div className="bg-white rounded-lg p-8 max-w-md w-full">
         <h2 className="text-2xl font-bold mb-4">Forgot password</h2>
         <p className="text-gray-600 mb-6">
-          Enter your email for the verification process, we will send 6 digits code to your email.
+          Enter your email for the verification process, we will send 6 digits
+          code to your email.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
