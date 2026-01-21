@@ -38,10 +38,6 @@ export default function AdminUsersPage() {
 
   useEffect(() => {
     const user = getUser();
-    if (!user || !hasRole('ADMIN')) {
-      router.push('/login');
-      return;
-    }
     fetchUsers();
   }, [filters, pagination.page]);
 

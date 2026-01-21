@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import Header from '@/components/Header';
+import { api } from '@/lib/api';
+import { getUser, hasRole } from '@/lib/auth';
+import toast from 'react-hot-toast';
 import Link from 'next/link';
-
-/* ================= TYPES ================= */
 
 interface User {
   id: string;
@@ -18,92 +20,85 @@ interface User {
   avatar?: string;
 }
 
-/* ================= PAGE ================= */
-
 export default function EditUserPage() {
   const router = useRouter();
   const params = useParams();
-  const userId = Array.isArray(params.id) ? params.id[0] : params.id;
-
+  const userId = params.id as string;
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    role: 'USER',
+    role: '',
     gender: '',
-    language: 'Tiếng Việt',
-    country: 'Việt Nam',
-    timezone: 'UTC+7',
+    language: '',
+    country: '',
+    timezone: '',
     avatar: '',
   });
 
-  /* ================= MOCK LOAD USER (FE ONLY) ================= */
-
   useEffect(() => {
-    if (!userId) return;
-
-    const mockUser: User = {
-      id: userId,
-      name: 'Demo User',
-      email: 'demo@email.com',
-      role: 'USER',
-      gender: 'Nam',
-      language: 'Tiếng Việt',
-      country: 'Việt Nam',
-      timezone: 'UTC+7',
-      avatar: '',
-    };
-
-    setUser(mockUser);
-    setFormData({
-      name: mockUser.name,
-      email: mockUser.email,
-      role: mockUser.role,
-      gender: mockUser.gender || '',
-      language: mockUser.language || 'Tiếng Việt',
-      country: mockUser.country || 'Việt Nam',
-      timezone: mockUser.timezone || 'UTC+7',
-      avatar: mockUser.avatar || '',
-    });
-
-    setLoading(false);
+    const currentUser = getUser();
+    fetchUser();
   }, [userId]);
 
-  /* ================= SUBMIT (FE ONLY) ================= */
+  const fetchUser = async () => {
+    setLoading(true);
+    const response = await api.get<User>(`/api/admin/users/${userId}`);
+    setLoading(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+    if (response.data) {
+      setUser(response.data);
+      setFormData({
+        name: response.data.name,
+        email: response.data.email,
+        role: response.data.role,
+        gender: response.data.gender || '',
+        language: response.data.language || 'Tiếng Việt',
+        country: response.data.country || 'Việt Nam',
+        timezone: response.data.timezone || 'UTC+7',
+        avatar: response.data.avatar || '',
+      });
+    } else {
+      toast.error(response.error || 'Failed to load user');
+      router.push('/admin/users');
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
 
-    setTimeout(() => {
-      setSaving(false);
-      router.push('/admin/users');
-    }, 800);
-  };
+    const response = await api.put(`/api/admin/users/${userId}`, formData);
+    setSaving(false);
 
-  /* ================= LOADING ================= */
+    if (response.error) {
+      toast.error(response.error);
+    } else {
+      toast.success('User updated successfully!');
+      router.push('/admin/users');
+    }
+  };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        Loading...
+      <div className="min-h-screen bg-gray-100">
+        <Header />
+        <div className="container mx-auto p-8">
+          <div className="text-center">Loading...</div>
+        </div>
       </div>
     );
   }
 
-  /* ================= MAIN RENDER ================= */
-
   return (
     <div className="min-h-screen bg-gray-100">
+      <Header />
+      
       <div className="container mx-auto p-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">
-            Chỉnh sửa thông tin tài khoản
-          </h1>
-
+          <h1 className="text-3xl font-bold">Chỉnh sửa thông tin tài khoản</h1>
           <div className="flex space-x-4">
             <Link
               href="/admin"
@@ -111,7 +106,6 @@ export default function EditUserPage() {
             >
               Quản lí Sự Kiện
             </Link>
-
             <Link
               href="/admin/users"
               className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-light"
@@ -134,71 +128,95 @@ export default function EditUserPage() {
                 {user?.name?.[0] || 'U'}
               </div>
             )}
-            <h2 className="text-2xl font-bold">{user?.name}</h2>
+            <div>
+              <h2 className="text-2xl font-bold">{user?.name}</h2>
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Input
-                label="Name"
-                value={formData.name}
-                onChange={(v) =>
-                  setFormData({ ...formData, name: v })
-                }
-              />
+              <div>
+                <label className="block text-sm font-medium mb-2">Name</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                />
+              </div>
 
-              <Input
-                label="Email"
-                type="email"
-                value={formData.email}
-                onChange={(v) =>
-                  setFormData({ ...formData, email: v })
-                }
-              />
+              <div>
+                <label className="block text-sm font-medium mb-2">Email</label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                />
+              </div>
 
-              <Select
-                label="Account Type"
-                value={formData.role}
-                options={['USER', 'EVENT_CREATOR', 'ADMIN']}
-                onChange={(v) =>
-                  setFormData({ ...formData, role: v })
-                }
-              />
+              <div>
+                <label className="block text-sm font-medium mb-2">Account Type</label>
+                <select
+                  value={formData.role}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option value="USER">User</option>
+                  <option value="EVENT_CREATOR">Event Creator</option>
+                  <option value="ADMIN">Admin</option>
+                </select>
+              </div>
 
-              <Select
-                label="Gender"
-                value={formData.gender}
-                options={['', 'Nam', 'Nữ']}
-                onChange={(v) =>
-                  setFormData({ ...formData, gender: v })
-                }
-              />
+              <div>
+                <label className="block text-sm font-medium mb-2">Gender</label>
+                <select
+                  value={formData.gender}
+                  onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option value="">Select</option>
+                  <option value="Nam">Nam</option>
+                  <option value="Nữ">Nữ</option>
+                </select>
+              </div>
 
-              <Input
-                label="Country"
-                value={formData.country}
-                onChange={(v) =>
-                  setFormData({ ...formData, country: v })
-                }
-              />
+              <div>
+                <label className="block text-sm font-medium mb-2">Country</label>
+                <input
+                  type="text"
+                  value={formData.country}
+                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                />
+              </div>
 
-              <Select
-                label="Language"
-                value={formData.language}
-                options={['Tiếng Việt', 'English']}
-                onChange={(v) =>
-                  setFormData({ ...formData, language: v })
-                }
-              />
+              <div>
+                <label className="block text-sm font-medium mb-2">Language</label>
+                <select
+                  value={formData.language}
+                  onChange={(e) => setFormData({ ...formData, language: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option value="Tiếng Việt">Tiếng Việt</option>
+                  <option value="English">English</option>
+                </select>
+              </div>
 
-              <Select
-                label="Time Zone"
-                value={formData.timezone}
-                options={['UTC+0', 'UTC+7', 'UTC+9', 'UTC+1', 'UTC-4']}
-                onChange={(v) =>
-                  setFormData({ ...formData, timezone: v })
-                }
-              />
+              <div>
+                <label className="block text-sm font-medium mb-2">Time Zone</label>
+                <select
+                  value={formData.timezone}
+                  onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option value="UTC+0">UTC+0 (UTC)</option>
+                  <option value="UTC+7">UTC+7</option>
+                  <option value="UTC+9">UTC+9 (Japan)</option>
+                  <option value="UTC+1">UTC+1 (Europe - DST)</option>
+                  <option value="UTC-4">UTC-4 (US East - DST)</option>
+                </select>
+              </div>
             </div>
 
             <div className="flex space-x-4">
@@ -209,7 +227,6 @@ export default function EditUserPage() {
               >
                 {saving ? 'Saving...' : 'Save'}
               </button>
-
               <button
                 type="button"
                 onClick={() => router.push('/admin/users')}
@@ -221,65 +238,6 @@ export default function EditUserPage() {
           </form>
         </div>
       </div>
-    </div>
-  );
-}
-
-/* ================= REUSABLE INPUTS ================= */
-
-function Input({
-  label,
-  value,
-  onChange,
-  type = 'text',
-}: {
-  label: string;
-  value: string;
-  type?: string;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div>
-      <label className="block text-sm font-medium mb-2">
-        {label}
-      </label>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-      />
-    </div>
-  );
-}
-
-function Select({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  options: string[];
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div>
-      <label className="block text-sm font-medium mb-2">
-        {label}
-      </label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-      >
-        {options.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt || 'Select'}
-          </option>
-        ))}
-      </select>
     </div>
   );
 }
