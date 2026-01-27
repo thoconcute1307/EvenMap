@@ -33,7 +33,7 @@ export default function AdminEditEventPage() {
     regionId: '',
   });
 
-  
+
 
   const fetchCategoriesAndRegions = async () => {
     try {
@@ -84,7 +84,7 @@ export default function AdminEditEventPage() {
     }
 
     const addressLower = address.toLowerCase();
-    
+
     // Kiểm tra có số nhà không (bắt đầu bằng số)
     const hasNumber = /^\d+/.test(address.trim());
     if (!hasNumber) {
@@ -156,7 +156,7 @@ export default function AdminEditEventPage() {
   return (
     <div className="min-h-screen bg-gray-100">
       <Header />
-      
+
       <div className="container mx-auto p-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Chỉnh sửa sự kiện</h1>

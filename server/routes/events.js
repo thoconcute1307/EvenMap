@@ -11,13 +11,13 @@ const prisma = new PrismaClient();
 // Get all events with filters
 router.get('/', async (req, res) => {
   try {
-    const { 
-      search, 
-      category, 
-      region, 
-      status, 
-      page = 1, 
-      limit = 10 
+    const {
+      search,
+      category,
+      region,
+      status,
+      page = 1,
+      limit = 10
     } = req.query;
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -261,7 +261,7 @@ router.put('/:id', authenticate, async (req, res) => {
 
     if (location !== undefined) {
       updateData.location = location;
-      
+
       // Get region name for better geocoding
       let regionName = null;
       const finalRegionId = regionId !== undefined ? regionId : event.regionId;
@@ -273,7 +273,7 @@ router.put('/:id', authenticate, async (req, res) => {
           regionName = region.name;
         }
       }
-      
+
       // Re-geocode if location changed, with region name for better accuracy
       const coordinates = await geocodeAddress(location, regionName);
       updateData.latitude = coordinates?.latitude || null;
@@ -313,7 +313,7 @@ router.put('/:id', authenticate, async (req, res) => {
     if (changes.length > 0) {
       for (const interest of interestedUsers) {
         await sendEventChanged(interest.user.email, event.name, changes);
-        
+
         // Create notification
         await prisma.notification.create({
           data: {
@@ -358,7 +358,7 @@ router.delete('/:id', authenticate, async (req, res) => {
 
     for (const interest of interestedUsers) {
       await sendEventCancelled(interest.user.email, event.name);
-      
+
       // Create notification
       await prisma.notification.create({
         data: {
