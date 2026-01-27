@@ -14,22 +14,13 @@ export default function RoleSelectionPage() {
               📍
             </div>
           </div>
-<<<<<<< HEAD
-          <h1 className="text-4xl font-bold mb-2">Event Map</h1>
-          <h2 className="text-2xl font-semibold mt-8">Choose your account type</h2>
-=======
           <h1 className="text-gray-600 text-4xl font-bold mb-2">Event Map</h1>
           <h2 className="text-gray-600 text-2xl font-semibold mt-8">Choose your account type</h2>
->>>>>>> QuocDo2
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 mt-8">
           <div className="bg-white rounded-lg shadow-lg p-8 text-center flex flex-col h-full">
-<<<<<<< HEAD
-            <h3 className="text-2xl font-bold mb-4">For User</h3>
-=======
             <h3 className="text-gray-600 text-2xl font-bold mb-4">For User</h3>
->>>>>>> QuocDo2
             <p className="text-gray-600 mb-6 flex-grow">
               An account for viewing, searching, and saving favorite events
             </p>
@@ -42,11 +33,7 @@ export default function RoleSelectionPage() {
           </div>
 
           <div className="bg-white rounded-lg shadow-lg p-8 text-center flex flex-col h-full">
-<<<<<<< HEAD
-            <h3 className="text-2xl font-bold mb-4">For Hoster</h3>
-=======
             <h3 className="text-gray-600 text-2xl font-bold mb-4">For Hoster</h3>
->>>>>>> QuocDo2
             <p className="text-gray-600 mb-6 flex-grow">
               An account used to create and manage events
             </p>

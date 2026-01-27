@@ -90,9 +90,9 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 text-gray-800">
       <Header />
-      
+
       <div className="container mx-auto p-8">
         <div className="bg-white rounded-lg shadow-md p-8 max-w-4xl mx-auto">
           <div className="flex justify-between items-start mb-6">
