@@ -15,6 +15,10 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const user = getUser();
+    if (!user || !hasRole('ADMIN')) {
+      router.push('/login');
+      return;
+    }
     fetchStats();
   }, []);
 

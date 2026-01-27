@@ -40,6 +40,10 @@ export default function EditUserPage() {
 
   useEffect(() => {
     const currentUser = getUser();
+    if (!currentUser || !hasRole('ADMIN')) {
+      router.push('/login');
+      return;
+    }
     fetchUser();
   }, [userId]);
 

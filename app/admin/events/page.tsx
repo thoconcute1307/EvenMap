@@ -34,6 +34,10 @@ export default function AdminEventsPage() {
 
   useEffect(() => {
     const user = getUser();
+    if (!user || !hasRole('ADMIN')) {
+      router.push('/login');
+      return;
+    }
     fetchCategoriesAndRegions();
     fetchEvents();
   }, [filters, pagination.page]);
