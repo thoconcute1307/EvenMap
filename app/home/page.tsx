@@ -60,6 +60,52 @@ export default function HomePage() {
     }
   }, [filters.region, regions]);
 
+  const fetchCategories = async () => {
+    try {
+      const response = await api.get('/api/categories');
+      if (response.data) {
+        setCategories(response.data);
+      }
+    } catch (error) {
+      // Fallback to backend API
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/categories`);
+      const data = await response.json();
+      if (data) setCategories(data);
+    }
+  };
+
+  const fetchRegions = async () => {
+    try {
+      const response = await api.get('/api/regions');
+      if (response.data) {
+        setRegions(response.data);
+      }
+    } catch (error) {
+      // Fallback to backend API
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/regions`);
+      const data = await response.json();
+      if (data) setRegions(data);
+    }
+  };
+
+  const fetchEvents = async () => {
+    setLoading(true);
+    const params = new URLSearchParams({
+      page: pagination.page.toString(),
+      limit: pagination.limit.toString(),
+      ...Object.fromEntries(Object.entries(filters).filter(([_, v]) => v)),
+    });
+
+    const response = await api.get<{ events: Event[]; pagination: any }>(`/api/events?${params}`);
+    setLoading(false);
+
+    if (response.data) {
+      setEvents(response.data.events);
+      setPagination(response.data.pagination);
+    } else {
+      toast.error(response.error || 'Failed to load events');
+    }
+  };
 
   const handleInterested = async (eventId: string) => {
     await fetchEvents();
@@ -91,35 +137,35 @@ export default function HomePage() {
     try {
       const apiKey = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || 'pk.eyJ1IjoibmluamFzY2hvb2wzNyIsImEiOiJjbWs5dWFsN28xdnBqM2VvdTF1dm15dzR2In0.LnfhFNg9JrGVOWdGWjE4KA';
       // Build full address: location + region + Vietnam
-      const fullAddress = regionName
+      const fullAddress = regionName 
         ? `${location}, ${regionName}, Vietnam`
         : `${location}, Vietnam`;
-
+      
       // Extract address number
       const addressNumber = location.match(/^\d+/)?.[0];
       const addressLower = location.toLowerCase();
-
+      
       // Strategy 1: Try to find exact address with number
       let response = await fetch(
         `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(fullAddress)}.json?access_token=${apiKey}&country=vn&types=address&limit=10`
       );
       let data = await response.json();
-
+      
       if (data.features && data.features.length > 0) {
         // Find best match with matching house number
         let bestMatch = null;
         let bestScore = 0;
-
+        
         for (const feature of data.features) {
           if (feature.place_type && feature.place_type.includes('address')) {
             let score = 0;
             const featureText = feature.text || feature.place_name || '';
-
+            
             // Check if address number matches
             if (addressNumber && featureText.includes(addressNumber)) {
               score += 10;
             }
-
+            
             // Check street name match
             const streetName = location.match(/đường\s+([^,]+)|street\s+([^,]+)/i)?.[1] || location.match(/phố\s+([^,]+)/i)?.[1];
             if (streetName) {
@@ -128,88 +174,88 @@ export default function HomePage() {
                 score += 5;
               }
             }
-
+            
             // Use relevance score
             if (feature.relevance) {
               score += feature.relevance * 2;
             }
-
+            
             if (score > bestScore) {
               bestScore = score;
               bestMatch = feature;
             }
           }
         }
-
+        
         if (bestMatch) {
           const [lng, lat] = bestMatch.center;
           return { lat, lng };
         }
       }
-
+      
       // Strategy 2: Try with POI (landmarks) if address contains landmark keywords
       const landmarkKeywords = ['đại học', 'university', 'trường', 'school', 'bệnh viện', 'hospital'];
       const hasLandmark = landmarkKeywords.some(keyword => addressLower.includes(keyword));
-
+      
       if (hasLandmark) {
         // Find landmark first
         response = await fetch(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(fullAddress)}.json?access_token=${apiKey}&country=vn&types=poi&limit=5`
         );
         data = await response.json();
-
+        
         if (data.features && data.features.length > 0) {
           const landmark = data.features[0];
           const [landmarkLng, landmarkLat] = landmark.center;
-
+          
           // Now search for address near the landmark
           response = await fetch(
             `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(fullAddress)}.json?access_token=${apiKey}&country=vn&types=address&proximity=${landmarkLng},${landmarkLat}&limit=10`
           );
           data = await response.json();
-
+          
           if (data.features && data.features.length > 0) {
             // Find best match near landmark
             let bestMatch = null;
             let bestScore = 0;
-
+            
             for (const feature of data.features) {
               if (feature.place_type && feature.place_type.includes('address')) {
                 let score = 0;
-
+                
                 if (addressNumber && feature.text && feature.text.includes(addressNumber)) {
                   score += 10;
                 }
-
+                
                 // Prefer closer to landmark
                 const [featureLng, featureLat] = feature.center;
                 const distance = Math.sqrt(
                   Math.pow(featureLng - landmarkLng, 2) + Math.pow(featureLat - landmarkLat, 2)
                 );
                 score += (1 / (distance + 0.0001)) * 5;
-
+                
                 if (feature.relevance) {
                   score += feature.relevance * 2;
                 }
-
+                
                 if (score > bestScore) {
                   bestScore = score;
                   bestMatch = feature;
                 }
               }
             }
-
+            
             if (bestMatch) {
               const [lng, lat] = bestMatch.center;
               return { lat, lng };
             }
-
+            
             // Fallback to landmark location
             return { lat: landmarkLat, lng: landmarkLng };
           }
         }
       }
-
+      
       // Strategy 3: Fallback - use first result
       response = await fetch(
         `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(fullAddress)}.json?access_token=${apiKey}&country=vn&limit=1`
@@ -219,7 +265,7 @@ export default function HomePage() {
         const [lng, lat] = data.features[0].center;
         return { lat, lng };
       }
-
+      
       return null;
     } catch (error) {
       console.error('Geocoding error:', error);
@@ -229,15 +275,15 @@ export default function HomePage() {
 
   const handleViewMap = async () => {
     if (!selectedEvent) return;
-
+    
     setShowModal(false);
-
+    
     // Geocode địa chỉ đầy đủ để đảm bảo đúng vị trí
     const coordinates = await geocodeEventAddress(
       selectedEvent.location,
       selectedEvent.region?.name
     );
-
+    
     if (coordinates) {
       // Focus map on event location với địa chỉ đã geocode lại
       setMapCenter(coordinates);
@@ -254,7 +300,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-100">
       <Header />
-
+      
       <div className="container mx-auto p-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Map Section */}
@@ -262,8 +308,8 @@ export default function HomePage() {
             <div className="bg-white rounded-lg shadow-md p-4 mb-4">
               <h2 className="text-xl font-bold mb-4">Event Map</h2>
               <div className="h-96 rounded-lg overflow-hidden">
-                <MapComponent
-                  events={events}
+                <MapComponent 
+                  events={events} 
                   onEventClick={handleEventClick}
                   center={mapCenter}
                   zoom={mapZoom}
