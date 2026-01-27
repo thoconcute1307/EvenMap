@@ -8,12 +8,11 @@ import { api } from '@/lib/api';
 import { getUser, hasRole } from '@/lib/auth';
 import { Event } from '@/types/event';
 import toast from 'react-hot-toast';
-import Link from 'next/link';
 import dynamic from 'next/dynamic';
 
 const MapComponent = dynamic(() => import('@/components/MapComponent'), { ssr: false });
 
-export default function AdminEditEventPage() {
+export default function EditEventPage() {
   const router = useRouter();
   const params = useParams();
   const eventId = params.id as string;
@@ -33,19 +32,15 @@ export default function AdminEditEventPage() {
     regionId: '',
   });
 
-<<<<<<< HEAD
   useEffect(() => {
     const user = getUser();
-    if (!user || !hasRole('ADMIN')) {
+    if (!user || !hasRole('EVENT_CREATOR')) {
       router.push('/login');
       return;
     }
     fetchCategoriesAndRegions();
     fetchEvent();
   }, [eventId]);
-=======
-
->>>>>>> a9fa25d37059797d341281ad2e4f718ce880bef2
 
   const fetchCategoriesAndRegions = async () => {
     try {
@@ -86,7 +81,7 @@ export default function AdminEditEventPage() {
       });
     } else {
       toast.error(response.error || 'Failed to load event');
-      router.push('/admin/events');
+      router.push('/creator/events');
     }
   };
 
@@ -96,11 +91,7 @@ export default function AdminEditEventPage() {
     }
 
     const addressLower = address.toLowerCase();
-<<<<<<< HEAD
     
-=======
-
->>>>>>> a9fa25d37059797d341281ad2e4f718ce880bef2
     // Kiểm tra có số nhà không (bắt đầu bằng số)
     const hasNumber = /^\d+/.test(address.trim());
     if (!hasNumber) {
@@ -147,14 +138,14 @@ export default function AdminEditEventPage() {
       return;
     }
 
-    const response = await api.put(`/api/admin/events/${eventId}`, formData);
+    const response = await api.put(`/api/events/${eventId}`, formData);
     setSaving(false);
 
     if (response.error) {
       toast.error(response.error);
     } else {
       toast.success('Cập nhật sự kiện thành công!');
-      router.push('/admin/events');
+      router.push('/creator/events');
     }
   };
 
@@ -172,29 +163,9 @@ export default function AdminEditEventPage() {
   return (
     <div className="min-h-screen bg-gray-100">
       <Header />
-<<<<<<< HEAD
       
-=======
-
->>>>>>> a9fa25d37059797d341281ad2e4f718ce880bef2
       <div className="container mx-auto p-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Chỉnh sửa sự kiện</h1>
-          <div className="flex space-x-4">
-            <Link
-              href="/admin/events"
-              className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-light"
-            >
-              Quản lí Sự Kiện
-            </Link>
-            <Link
-              href="/admin/users"
-              className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300"
-            >
-              Quản lí tài khoản
-            </Link>
-          </div>
-        </div>
+        <h1 className="text-3xl font-bold mb-6">Chỉnh sửa sự kiện</h1>
 
         <form onSubmit={handleSubmit} className="bg-gray-200 rounded-lg p-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

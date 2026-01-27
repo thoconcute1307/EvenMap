@@ -20,7 +20,10 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = useState<any>(null);
+<<<<<<< HEAD
   const [mounted, setMounted] = useState(false);
+=======
+>>>>>>> a9fa25d37059797d341281ad2e4f718ce880bef2
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -28,7 +31,10 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
+<<<<<<< HEAD
     setMounted(true);
+=======
+>>>>>>> a9fa25d37059797d341281ad2e4f718ce880bef2
     const currentUser = getUser();
     setUser(currentUser);
     if (currentUser) {
@@ -97,7 +103,11 @@ export default function Header() {
         </div>
 
         <div className="flex items-center space-x-4">
+<<<<<<< HEAD
           {mounted && hasRole('EVENT_CREATOR') && (
+=======
+          {hasRole('EVENT_CREATOR') && (
+>>>>>>> a9fa25d37059797d341281ad2e4f718ce880bef2
             <Link
               href="/creator/events/create"
               className="bg-green-600 px-4 py-2 rounded-lg hover:bg-green-700 flex items-center space-x-2"
@@ -107,7 +117,11 @@ export default function Header() {
             </Link>
           )}
 
+<<<<<<< HEAD
           {mounted && user && (
+=======
+          {user && (
+>>>>>>> a9fa25d37059797d341281ad2e4f718ce880bef2
             <>
               <div className="relative">
                 <button
@@ -162,7 +176,11 @@ export default function Header() {
                   <span>▼</span>
                 </button>
 
+<<<<<<< HEAD
                 {showUserMenu && mounted && (
+=======
+                {showUserMenu && (
+>>>>>>> a9fa25d37059797d341281ad2e4f718ce880bef2
                   <div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-lg shadow-lg z-50">
                     {hasRole('ADMIN') ? (
                       <>
@@ -240,7 +258,11 @@ export default function Header() {
             </>
           )}
 
+<<<<<<< HEAD
           {mounted && !user && (
+=======
+          {!user && (
+>>>>>>> a9fa25d37059797d341281ad2e4f718ce880bef2
             <Link
               href="/login"
               className="bg-primary px-4 py-2 rounded-lg hover:bg-primary-light"

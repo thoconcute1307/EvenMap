@@ -15,10 +15,13 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const user = getUser();
+<<<<<<< HEAD
     if (!user || !hasRole('ADMIN')) {
       router.push('/login');
       return;
     }
+=======
+>>>>>>> a9fa25d37059797d341281ad2e4f718ce880bef2
     fetchStats();
   }, []);
 
@@ -48,7 +51,11 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-100">
       <Header />
+<<<<<<< HEAD
       
+=======
+
+>>>>>>> a9fa25d37059797d341281ad2e4f718ce880bef2
       <div className="container mx-auto p-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>

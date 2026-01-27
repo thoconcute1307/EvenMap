@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+<<<<<<< HEAD
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -10,6 +11,20 @@ import logoMap from '../../img/event_map_logo.jpeg'
 
 export default function RegisterHosterPage() {
   const router = useRouter();
+=======
+import toast from 'react-hot-toast';
+
+import { api } from '@/lib/api';
+import AuthLayout from '@/components/auth/AuthLayout';
+import TextInput from '@/components/auth/TextInput';
+import PasswordInput from '@/components/auth/PasswordInput';
+import AuthButton from '@/components/auth/AuthButton';
+import AuthFooter from '@/components/auth/AuthFooter';
+
+export default function RegisterHosterPage() {
+  const router = useRouter();
+
+>>>>>>> QuocDo2
   const [formData, setFormData] = useState({
     name: '',
     company: '',
@@ -17,21 +32,33 @@ export default function RegisterHosterPage() {
     password: '',
     reEnterPassword: '',
   });
+<<<<<<< HEAD
   const [agreeToTerms, setAgreeToTerms] = useState(false);
+=======
+
+>>>>>>> QuocDo2
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+<<<<<<< HEAD
     setLoading(true);
 
     if (formData.password.length < 6) {
       toast.error('Password must be at least 6 characters');
       setLoading(false);
+=======
+
+    // Validation
+    if (formData.password.length < 6) {
+      toast.error('Password must be at least 6 characters');
+>>>>>>> QuocDo2
       return;
     }
 
     if (formData.password !== formData.reEnterPassword) {
       toast.error('Passwords do not match');
+<<<<<<< HEAD
       setLoading(false);
       return;
     }
@@ -44,6 +71,18 @@ export default function RegisterHosterPage() {
 
     const response = await api.post('/api/auth/register', {
       ...formData,
+=======
+      return;
+    }
+
+    setLoading(true);
+
+    const response = await api.post('/api/auth/register', {
+      name: formData.name,
+      company: formData.company,
+      email: formData.email,
+      password: formData.password,
+>>>>>>> QuocDo2
       role: 'EVENT_CREATOR',
     });
 
@@ -52,12 +91,20 @@ export default function RegisterHosterPage() {
     if (response.error) {
       toast.error(response.error);
     } else {
+<<<<<<< HEAD
       toast.success('Registration successful! Please check your email for verification code.');
       router.push(`/verify?email=${encodeURIComponent(formData.email)}&type=EMAIL_VERIFICATION`);
+=======
+      toast.success('Registration successful! Please check your email.');
+      router.push(
+        `/verify?email=${encodeURIComponent(formData.email)}&type=EMAIL_VERIFICATION`
+      );
+>>>>>>> QuocDo2
     }
   };
 
   return (
+<<<<<<< HEAD
     <div className="min-h-screen flex">
       <div className="flex-1 flex items-center justify-center bg-white p-8">
         <div className="w-full max-w-md">
@@ -181,5 +228,73 @@ export default function RegisterHosterPage() {
         />
       </div>
     </div>
+=======
+    <AuthLayout split>
+      <h1 className="text-3xl font-bold text-gray-700 mb-6">
+        Get Started Now
+      </h1>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <TextInput
+          placeholder="Name"
+          value={formData.name}
+          onChange={(e) =>
+            setFormData({ ...formData, name: e.target.value })
+          }
+          required
+        />
+
+        <TextInput
+          placeholder="Company name"
+          value={formData.company}
+          onChange={(e) =>
+            setFormData({ ...formData, company: e.target.value })
+          }
+          required
+        />
+
+        <TextInput
+          type="email"
+          placeholder="Email address"
+          value={formData.email}
+          onChange={(e) =>
+            setFormData({ ...formData, email: e.target.value })
+          }
+          required
+        />
+
+        <PasswordInput
+          placeholder="Password"
+          value={formData.password}
+          onChange={(e) =>
+            setFormData({ ...formData, password: e.target.value })
+          }
+          required
+        />
+
+        <PasswordInput
+          placeholder="Re-enter password"
+          value={formData.reEnterPassword}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              reEnterPassword: e.target.value,
+            })
+          }
+          required
+        />
+
+        <AuthButton loading={loading}>
+          Signup
+        </AuthButton>
+      </form>
+
+      <AuthFooter
+        text="Have an account?"
+        linkText="Sign In"
+        href="/login"
+      />
+    </AuthLayout>
+>>>>>>> QuocDo2
   );
 }
