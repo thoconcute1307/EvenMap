@@ -32,7 +32,6 @@ export default function AdminEventsPage() {
     totalPages: 0,
   });
 
-<<<<<<< HEAD
   useEffect(() => {
     const user = getUser();
     if (!user || !hasRole('ADMIN')) {
@@ -42,9 +41,6 @@ export default function AdminEventsPage() {
     fetchCategoriesAndRegions();
     fetchEvents();
   }, [filters, pagination.page]);
-=======
-
->>>>>>> a9fa25d37059797d341281ad2e4f718ce880bef2
 
   const fetchCategoriesAndRegions = async () => {
     try {
@@ -102,11 +98,7 @@ export default function AdminEventsPage() {
   return (
     <div className="min-h-screen bg-gray-100">
       <Header />
-<<<<<<< HEAD
       
-=======
-
->>>>>>> a9fa25d37059797d341281ad2e4f718ce880bef2
       <div className="container mx-auto p-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Quản lý sự kiện</h1>
@@ -202,7 +194,6 @@ export default function AdminEventsPage() {
                         {new Date(event.startTime).toLocaleDateString('vi-VN')}
                       </td>
                       <td className="px-6 py-4">
-<<<<<<< HEAD
                         <span className={`px-2 py-1 rounded text-xs ${
                           event.status === 'UPCOMING' ? 'bg-blue-100 text-blue-800' :
                           event.status === 'ONGOING' ? 'bg-green-100 text-green-800' :
@@ -211,15 +202,6 @@ export default function AdminEventsPage() {
                           {event.status === 'UPCOMING' ? 'Sắp diễn ra' :
                            event.status === 'ONGOING' ? 'Đang diễn ra' :
                            'Đã kết thúc'}
-=======
-                        <span className={`px-2 py-1 rounded text-xs ${event.status === 'UPCOMING' ? 'bg-blue-100 text-blue-800' :
-                            event.status === 'ONGOING' ? 'bg-green-100 text-green-800' :
-                              'bg-gray-100 text-gray-800'
-                          }`}>
-                          {event.status === 'UPCOMING' ? 'Sắp diễn ra' :
-                            event.status === 'ONGOING' ? 'Đang diễn ra' :
-                              'Đã kết thúc'}
->>>>>>> a9fa25d37059797d341281ad2e4f718ce880bef2
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm">{event.creator?.name || 'N/A'}</td>

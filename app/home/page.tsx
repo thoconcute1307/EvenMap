@@ -337,7 +337,7 @@ export default function HomePage() {
 
             {/* Event List */}
             <div className="bg-white rounded-lg shadow-md p-4">
-              <h3 className="font-bold mb-4">Các Sự Kiện Nổi Bật</h3>
+              <h3 className="font-bold mb-4">Các Sự Kiện</h3>
               {loading ? (
                 <div className="text-center py-8">Loading...</div>
               ) : events.length === 0 ? (
