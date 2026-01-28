@@ -13,7 +13,7 @@ import eventMapLogo from '../img/event_map_logo.jpeg';
 export default function LoginPage() {
   const router = useRouter();
 
-  const [email, setEmail] = useState('admin@eventmap.com');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
