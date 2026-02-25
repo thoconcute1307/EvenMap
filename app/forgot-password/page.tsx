@@ -3,29 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
-
 import AuthLayout from '@/components/auth/AuthLayout';
 import TextInput from '@/components/auth/TextInput';
 import AuthButton from '@/components/auth/AuthButton';
 import AuthFooter from '@/components/auth/AuthFooter';
 
-
-
-const api = {
-  post: (url: string, data: any) => {
-    return new Promise<{ error?: string }>((resolve) => {
-      setTimeout(() => {
-        // giả lập email hợp lệ
-        if (data.email === 'test@gmail.com') {
-          resolve({});
-        } else {
-          resolve({ error: 'Email does not exist' });
-        }
-      }, 1200);
-    });
-  },
-};
 
 
 export default function ForgotPasswordPage() {
@@ -38,16 +22,13 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     const response = await api.post('/api/auth/forgot-password', { email });
-
     setLoading(false);
 
     if (response.error) {
       toast.error(response.error);
     } else {
       toast.success('Password reset code sent to your email');
-      router.push(
-        `/verify?email=${encodeURIComponent(email)}&type=PASSWORD_RESET`
-      );
+      router.push(`/verify?email=${encodeURIComponent(email)}&type=PASSWORD_RESET`);
     }
   };
 

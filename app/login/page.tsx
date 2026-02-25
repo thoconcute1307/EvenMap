@@ -1,118 +1,130 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { toast } from 'react-hot-toast';
+import Link from 'next/link';
 import { api } from '@/lib/api';
 import { setToken, setUser } from '@/lib/auth';
-
-// ✅ ảnh trong project bạn: app/img/event_map_logo.jpeg
-import eventMapLogo from '../img/event_map_logo.jpeg';
+import toast from 'react-hot-toast';
+import Image from 'next/image';
+import logoMap from '../img/event_map_logo.jpeg'
 
 export default function LoginPage() {
   const router = useRouter();
-
-  const [email, setEmail] = useState('admin@eventmap.com');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (loading) return;
-
     setLoading(true);
-    try {
-      const res = await api.post('/api/auth/login', { email, password });
 
-      const { token, user } = res.data as { token: string; user: any };
-      if (!token || !user) throw new Error('Invalid response from server');
+    const response = await api.post<{ token: string; refreshToken: string; user: any }>('/api/auth/login', {
+      email,
+      password,
+    });
 
-      setToken(token);
-      setUser(user);
+    setLoading(false);
 
-      toast.success('Login successful');
+    if (response.error) {
+      toast.error(response.error);
+    } else if (response.data) {
+      setToken(response.data.token);
+      setUser(response.data.user);
+      toast.success('Login successful!');
 
-      if (user.role === 'ADMIN') router.push('/admin');
-      else router.push('/login'); // vì bản tách chưa có /home
-    } catch (err: any) {
-      console.error('Login error:', err);
-      toast.error(err?.response?.data?.error || err?.response?.data?.message || 'Login failed');
-    } finally {
-      setLoading(false);
+      // Redirect based on role
+      if (response.data.user.role === 'ADMIN') {
+        router.push('/admin');
+      } else if (response.data.user.role === 'EVENT_CREATOR') {
+        router.push('/creator');
+      } else {
+        router.push('/home');
+      }
     }
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
-        {/* LEFT: Form */}
-        <div className="flex items-center justify-center px-6 py-12">
-          <div className="w-full max-w-md">
-            <h1 className="text-4xl font-bold">Welcome back!</h1>
-            <p className="mt-2 text-gray-600">Enter your Credentials to access your account</p>
+    <div className="min-h-screen flex">
+      <div className="flex-1 flex items-center justify-center bg-white p-8">
+        <div className="w-full max-w-md">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold mb-2">Welcome back!</h1>
+            <p className="text-gray-600">Enter your Credentials to access your account</p>
+          </div>
 
-            <form onSubmit={handleLogin} className="mt-8 space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Email address</label>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium mb-2">Email address</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                onCopy={(e) => e.preventDefault()}
+                onPaste={(e) => e.preventDefault()}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <label className="flex items-center">
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="mt-2 w-full rounded-md border border-gray-300 px-4 py-3 outline-none focus:border-gray-500"
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="mr-2"
                 />
-              </div>
+                <span className="text-sm">Remember for 30 days</span>
+              </label>
+              <Link href="/forgot-password" className="text-sm text-blue-600 hover:underline">
+                Forgot password?
+              </Link>
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="mt-2 w-full rounded-md border border-gray-300 px-4 py-3 outline-none focus:border-gray-500"
-                />
-              </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary-light disabled:opacity-50"
+            >
+              {loading ? 'Logging in...' : 'Login'}
+            </button>
+          </form>
 
-              <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2 text-gray-600">
-                  <input type="checkbox" className="h-4 w-4" />
-                  Remember for 30 days
-                </label>
-                <a href="/forgot-password" className="text-blue-600 hover:underline">
-                  Forgot password?
-                </a>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full rounded-md bg-green-800 py-3 font-medium text-white hover:bg-green-900 disabled:opacity-50"
-              >
-                {loading ? 'Logging in...' : 'Login'}
-              </button>
-
-              <p className="text-center text-sm text-gray-600">
-                Don&apos;t have an account?{' '}
-                <a href="/register/user" className="text-blue-600 hover:underline">
-                  Sign Up
-                </a>
-              </p>
-            </form>
+          <div className="mt-6 text-center">
+            <p className="text-gray-600">
+              Don't have an account?{' '}
+              <Link href="/register/role" className="text-blue-600 hover:underline">
+                Sign Up
+              </Link>
+            </p>
           </div>
         </div>
+      </div>
 
-        {/* RIGHT: Image */}
-        <div className="relative hidden lg:block">
-          <Image
-            src={eventMapLogo}
-            alt="Event Map"
-            fill
-            className="object-cover"
-            priority
-          />
-        </div>
+      <div className="relative flex-1 hidden lg:flex items-center justify-center">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-400/80 via-indigo-400/80 to-purple-500/80" />
+        <Image
+          src={logoMap}
+          alt="Event map Logo"
+          fill
+          priority
+          className="object-contain"
+        />
       </div>
     </div>
   );

@@ -306,7 +306,7 @@ export default function HomePage() {
           {/* Map Section */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-md p-4 mb-4">
-              <h2 className="text-xl font-bold mb-4">Event Map</h2>
+              <h2 className="text-gray-600 text-xl font-bold mb-4">Event Map</h2>
               <div className="h-96 rounded-lg overflow-hidden">
                 <MapComponent 
                   events={events} 
@@ -322,17 +322,17 @@ export default function HomePage() {
           <div className="space-y-4">
             {/* Filters */}
             <div className="bg-white rounded-lg shadow-md p-4">
-              <h3 className="font-bold mb-4">Filters</h3>
+              <h3 className="text-gray-600 font-bold mb-4">Filters</h3>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Thể Loại Sự Kiện</label>
+                  <label className="text-gray-600 block text-sm font-medium mb-2">Thể Loại Sự Kiện</label>
                   <select
                     value={filters.category}
                     onChange={(e) => {
                       setFilters({ ...filters, category: e.target.value });
                       setPagination({ ...pagination, page: 1 });
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    className="text-gray-600 w-full px-4 py-2 border border-gray-300 rounded-lg"
                   >
                     <option value="">Tất cả</option>
                     {categories.map((cat) => (
@@ -344,14 +344,14 @@ export default function HomePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Khu Vực</label>
+                  <label className="text-gray-600 block text-sm font-medium mb-2">Khu Vực</label>
                   <select
                     value={filters.region}
                     onChange={(e) => {
                       setFilters({ ...filters, region: e.target.value });
                       setPagination({ ...pagination, page: 1 });
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    className="text-gray-600 w-full px-4 py-2 border border-gray-300 rounded-lg"
                   >
                     <option value="">Tất cả</option>
                     {regions.map((region) => (
@@ -363,14 +363,14 @@ export default function HomePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Trạng Thái</label>
+                  <label className="text-gray-600 block text-sm font-medium mb-2">Trạng Thái</label>
                   <select
                     value={filters.status}
                     onChange={(e) => {
                       setFilters({ ...filters, status: e.target.value });
                       setPagination({ ...pagination, page: 1 });
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    className="text-gray-600 w-full px-4 py-2 border border-gray-300 rounded-lg"
                   >
                     <option value="">Tất cả</option>
                     <option value="UPCOMING">Sắp diễn ra</option>
@@ -383,11 +383,11 @@ export default function HomePage() {
 
             {/* Event List */}
             <div className="bg-white rounded-lg shadow-md p-4">
-              <h3 className="font-bold mb-4">Các Sự Kiện Nổi Bật</h3>
+              <h3 className="text-gray-600 font-bold mb-4">Các Sự Kiện Nổi Bật</h3>
               {loading ? (
-                <div className="text-center py-8">Loading...</div>
+                <div className="text-gray-600 text-center py-8">Loading...</div>
               ) : events.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">Không có sự kiện</div>
+                <div className="text-gray-600 text-center py-8 text-gray-500">Không có sự kiện</div>
               ) : (
                 <div className="space-y-4">
                   {events.map((event) => (
